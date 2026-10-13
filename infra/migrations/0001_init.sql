@@ -1,4 +1,4 @@
--- Pulse — Faz 0 graf şeması
+-- Pumar — Faz 0 graf şeması
 -- Her şey tek bir bağlı graf: Sprint → Epic → Issue → Branch → Commit → MR → Pipeline → Deploy
 -- Kaynaklar: Jira (jira.crudfab.com) + GitLab (gitlab.crudfab.com), self-hosted.
 

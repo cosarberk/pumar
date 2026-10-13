@@ -1,4 +1,4 @@
--- Pulse — Faz 2: türetilmiş analitik view'lar
+-- Pumar — Faz 2: türetilmiş analitik view'lar
 -- changelog (work_item_transitions) ham veriden flow/cycle/aging hesaplar.
 
 BEGIN;

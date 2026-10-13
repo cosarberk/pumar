@@ -402,7 +402,7 @@ export function ReportCanvas({ doc, filters, nonce, cat, zoom, selId, onSelect, 
       <div className="rp-cover-foot">
         <div className="rp-cover-rule" />
         <div className="rp-cover-meta">
-          <span className="rp-cover-wm">Pulse<em> Analytics</em></span>
+          <span className="rp-cover-wm">Pumar<em> Analytics</em></span>
           <span className="rp-cover-tag">GitLab × Jira · birleşik proje analitiği</span>
         </div>
       </div>

@@ -22,7 +22,7 @@ export function ReportView({ id, project, onExit }: { id: string; project: strin
   return (
     <div className="rv">
       <div className="rv-bar">
-        <span className="mark">PULSE<i>/</i></span>
+        <span className="mark">PUMAR<i>/</i></span>
         <span className="rv-title">{doc.name}</span>
         <span className="rv-sub">{project}</span>
         <span style={{ flex: 1 }} />

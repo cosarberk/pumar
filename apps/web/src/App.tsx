@@ -64,7 +64,7 @@ function MainApp() {
     <div className="app">
       <header className="topbar">
         <div className="seg">
-          <span className="mark">PULSE<i>/</i></span>
+          <span className="mark">PUMAR<i>/</i></span>
           <span className="proj-chip" onClick={back} title="Proje değiştir">◂ {project}</span>
         </div>
         <nav className="tabs">

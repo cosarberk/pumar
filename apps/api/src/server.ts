@@ -1,5 +1,5 @@
 /**
- * Pulse API — analytics ve graf verisini web'e açar.
+ * Pumar API — analytics ve graf verisini web'e açar.
  *   GET  /health
  *   GET  /projects                      → picker için gerçek projeler + istatistik
  *   GET  /catalog                       → metrik/boyut kataloğu
@@ -15,21 +15,21 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
-import { runMetric, runCrosstab, runTrend, mrTrend, metricOptions, drillItems } from "@pulse/analytics/engine";
-import { catalog } from "@pulse/analytics/catalog";
+import { runMetric, runCrosstab, runTrend, mrTrend, metricOptions, drillItems } from "@pumar/analytics/engine";
+import { catalog } from "@pumar/analytics/catalog";
 import {
   agingItems, doneWithoutMr, unlinkedCode, busFactorRisk, reviewBottleneck,
   cycleByStatus, statusTransitions, repoActivity, codeActivitySummary,
-} from "@pulse/analytics/insights";
-import { projectsList, knowledgeGraph, contributors } from "@pulse/analytics/overview";
-import { cfd, cycleTime, velocity, weeklyThroughput, riskRadar, agingDistribution, wipItems, statusFlow, itemsByStatus, streamCards, itemsByTransition, filterOptions, flowSeries } from "@pulse/analytics/flow";
-import { reviewerLoad, reviewGraph, reviewStats } from "@pulse/analytics/review";
-import { collabBase, collabPerson } from "@pulse/analytics/collab";
-import { effectiveConfig, settingsView, saveSettings, testConnection, syncState } from "@pulse/analytics/settings";
-import { listTemplates, getTemplate, saveTemplate, deleteTemplate } from "@pulse/analytics/report";
-import { roots as universeRoots, expand as universeExpand, search as universeSearch, allGraph as universeAll } from "@pulse/analytics/universe";
+} from "@pumar/analytics/insights";
+import { projectsList, knowledgeGraph, contributors } from "@pumar/analytics/overview";
+import { cfd, cycleTime, velocity, weeklyThroughput, riskRadar, agingDistribution, wipItems, statusFlow, itemsByStatus, streamCards, itemsByTransition, filterOptions, flowSeries } from "@pumar/analytics/flow";
+import { reviewerLoad, reviewGraph, reviewStats } from "@pumar/analytics/review";
+import { collabBase, collabPerson } from "@pumar/analytics/collab";
+import { effectiveConfig, settingsView, saveSettings, testConnection, syncState } from "@pumar/analytics/settings";
+import { listTemplates, getTemplate, saveTemplate, deleteTemplate } from "@pumar/analytics/report";
+import { roots as universeRoots, expand as universeExpand, search as universeSearch, allGraph as universeAll } from "@pumar/analytics/universe";
 import { flowStages } from "./graph.js";
-import type { QuerySpec } from "@pulse/analytics/types";
+import type { QuerySpec } from "@pumar/analytics/types";
 
 // Depo kökü (collector girişi + web build'i buradan çözülür).
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
@@ -261,4 +261,4 @@ if (existsSync(WEB_DIST)) {
 }
 
 const port = Number(process.env.API_PORT ?? 4000);
-app.listen({ port, host: "0.0.0.0" }).then(() => app.log.info(`Pulse API :${port}`));
+app.listen({ port, host: "0.0.0.0" }).then(() => app.log.info(`Pumar API :${port}`));

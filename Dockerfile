@@ -1,7 +1,7 @@
-# Pulse — tek image: Fastify API + gömülü web (Vite build, same-origin /api).
+# Pumar — tek image: Fastify API + gömülü web (Vite build, same-origin /api).
 # Depo kökünden build edilir:  docker build -t ghcr.io/cosarberk/pumar .
 #
-# Pulse derleme adımı tutmaz; API ve collector doğrudan tsx ile koşar. Bu yüzden
+# Pumar derleme adımı tutmaz; API ve collector doğrudan tsx ile koşar. Bu yüzden
 # runtime image kaynak + node_modules taşır; yalnızca web statik olarak derlenir.
 
 FROM node:22-slim AS build
@@ -10,7 +10,7 @@ COPY . .
 # Tüm workspace bağımlılıkları (tsx/vite dahil) — reproducible için npm ci.
 RUN npm ci
 # Web'i statiğe derle → apps/web/dist (API bunu same-origin serve eder).
-RUN npm run build -w @pulse/web
+RUN npm run build -w @pumar/web
 
 FROM node:22-slim AS runtime
 ENV NODE_ENV=production

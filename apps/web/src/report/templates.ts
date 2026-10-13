@@ -40,7 +40,7 @@ const baseDoc = (name: string, description: string, blocks: Block[]): ReportDoc 
   name, description,
   pageSize: "A4", orientation: "portrait", margin: 18, showPageNumbers: true,
   cover: true, coverSubtitle: description,
-  header: "{{raporAdı}} · {{proje}}", footer: "Pulse · {{tarih}}",
+  header: "{{raporAdı}} · {{proje}}", footer: "Pumar · {{tarih}}",
   theme: { accent: "#c99a3b", font: "sans" },
   blocks,
 });

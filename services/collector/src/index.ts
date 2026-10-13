@@ -4,9 +4,9 @@
  * (commit/MR'lar issue key ile mevcut work_item'lara bağlanabilsin).
  *
  * Kullanım:
- *   pnpm --filter @pulse/collector sync        # tam senkron
- *   pnpm --filter @pulse/collector sync:jira   # yalnız Jira
- *   pnpm --filter @pulse/collector sync:gitlab # yalnız GitLab
+ *   pnpm --filter @pumar/collector sync        # tam senkron
+ *   pnpm --filter @pumar/collector sync:jira   # yalnız Jira
+ *   pnpm --filter @pumar/collector sync:gitlab # yalnız GitLab
  */
 import { pool } from "./db.js";
 import { initConfig } from "./config.js";

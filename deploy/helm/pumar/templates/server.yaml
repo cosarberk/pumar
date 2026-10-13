@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pulse
+  name: pumar
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.server.replicas }}
   selector:
     matchLabels:
-      app: pulse
+      app: pumar
   template:
     metadata:
       labels:
-        app: pulse
+        app: pumar
     spec:
       # API başlamadan önce şemayı uygula. migrate.ts idempotenttir
       # (schema_migrations izler); Postgres hazır değilse initContainer
@@ -25,7 +25,7 @@ spec:
             - name: DATABASE_URL
               value: postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@postgres:5432/{{ .Values.postgres.db }}
       containers:
-        - name: pulse
+        - name: pumar
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -35,7 +35,7 @@ spec:
               value: {{ .Values.server.port | quote }}
             - name: DATABASE_URL
               value: postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@postgres:5432/{{ .Values.postgres.db }}
-            # Jira/GitLab kimlikleri ENV'den verilmez; Pulse → "Ayarlar"
+            # Jira/GitLab kimlikleri ENV'den verilmez; Pumar → "Ayarlar"
             # ekranından DB'ye girilir (DB > env önceliği).
           resources: {{- toYaml .Values.server.resources | nindent 12 }}
           readinessProbe:
@@ -54,11 +54,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pulse
+  name: pumar
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    app: pulse
+    app: pumar
   ports:
     - port: {{ .Values.server.port }}
       targetPort: {{ .Values.server.port }}

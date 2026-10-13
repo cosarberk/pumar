@@ -1,7 +1,7 @@
-# Pulse Helm değerleri. Cluster'a özel alanları (storageClass, ingress host)
+# Pumar Helm değerleri. Cluster'a özel alanları (storageClass, ingress host)
 # doldurun; gerisi makul varsayılanlarla gelir.
 #
-# Jira/GitLab bağlantıları ENV'den GEÇİLMEZ — deploy sonrası Pulse içindeki
+# Jira/GitLab bağlantıları ENV'den GEÇİLMEZ — deploy sonrası Pumar içindeki
 # "Ayarlar" ekranından girilir ve DB'de tutulur. Böylece token'lar Helm
 # değerlerinde / cluster manifestinde durmaz.
 
@@ -17,9 +17,9 @@ storageClass: ''
 
 postgres:
   image: postgres:16-alpine
-  user: pulse
-  password: pulse
-  db: pulse
+  user: pumar
+  password: pumar
+  db: pumar
   storage: 10Gi
   resources:
     requests:
@@ -42,11 +42,11 @@ server:
       memory: 1Gi
 
 # Dış erişim (UI + API aynı host). enabled=true + host verildiğinde
-# kullanıcı Pulse'a bu URL'den erişir.
+# kullanıcı Pumar'a bu URL'den erişir.
 ingress:
   enabled: false
   className: nginx
-  host: pulse.example.com
+  host: pumar.example.com
   annotations:
     # Rapor PDF'leri / büyük grafik yanıtları için gövde limiti
     nginx.ingress.kubernetes.io/proxy-body-size: '25m'
@@ -55,4 +55,4 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
   tls:
     enabled: false
-    secretName: pulse-tls
+    secretName: pumar-tls

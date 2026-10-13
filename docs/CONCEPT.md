@@ -1,6 +1,6 @@
-# Pulse — Konsept & Mimari
+# Pumar — Konsept & Mimari
 
-> Kod adı: **Pulse** (değiştirilebilir). Self-hosted GitLab (`gitlab.crudfab.com`) +
+> Kod adı: **Pumar** (değiştirilebilir). Self-hosted GitLab (`gitlab.crudfab.com`) +
 > self-hosted Jira (`jira.crudfab.com`) verisini birleştirip, PO'nun ekip ve projeyi
 > tek yerden yönettiği; canlı, görsel ve **kendi raporunu üreten** bir platform.
 
@@ -15,7 +15,7 @@ olarak tutmak ve üstüne ileri görsel dil + generatif rapor motoru kurmak.
 Sprint → Epic → Issue → Branch → Commit → MR → Pipeline → Deploy → Release
 ```
 
-Çoğu araç bunları ayrı tablolar olarak gösterir. Pulse bunların hepsini **tek bir
+Çoğu araç bunları ayrı tablolar olarak gösterir. Pumar bunların hepsini **tek bir
 graf** (düğümler + kenarlar + zaman damgalı durum geçişleri) olarak modeller.
 "Uçuran" her özellik bu graftan doğar.
 

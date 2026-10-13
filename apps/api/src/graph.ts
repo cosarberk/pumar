@@ -1,5 +1,5 @@
 /** Value Stream akış verisi — proje-filtreli, gerçek work_items durumlarından. */
-import { query } from "@pulse/analytics/db";
+import { query } from "@pumar/analytics/db";
 
 export interface Stage { id: string; label: string; count: number }
 

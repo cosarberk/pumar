@@ -1,5 +1,5 @@
 /**
- * Pulse API istemcisi. Backend varsa gerçek veri; erişilemezse mock'a düşer.
+ * Pumar API istemcisi. Backend varsa gerçek veri; erişilemezse mock'a düşer.
  */
 import { mockCatalog, mockMetric, mockInsight, mockKnowledge, mockFlow, projectStats } from "./mock";
 import { setLinks } from "./jira";

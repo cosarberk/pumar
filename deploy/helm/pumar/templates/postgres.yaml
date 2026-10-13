@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: pulse-postgres
+  name: pumar-postgres
   namespace: {{ .Release.Namespace }}
 type: Opaque
 stringData:
@@ -12,7 +12,7 @@ stringData:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pulse-postgres
+  name: pumar-postgres
   namespace: {{ .Release.Namespace }}
 spec:
   accessModes: ['ReadWriteOnce']
@@ -45,7 +45,7 @@ spec:
             - containerPort: 5432
           envFrom:
             - secretRef:
-                name: pulse-postgres
+                name: pumar-postgres
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql/data
@@ -58,7 +58,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: pulse-postgres
+            claimName: pumar-postgres
 ---
 apiVersion: v1
 kind: Service

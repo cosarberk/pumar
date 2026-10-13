@@ -1,5 +1,5 @@
 /**
- * Pulse — domain modeli (graf düğümleri + kenarları).
+ * Pumar — domain modeli (graf düğümleri + kenarları).
  * SQL şeması (infra/migrations/0001_init.sql) ile birebir hizalıdır.
  *
  * Graf: Sprint → Epic → Issue(WorkItem) → Branch → Commit → MR → Pipeline → Deploy

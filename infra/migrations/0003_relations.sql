@@ -1,4 +1,4 @@
--- Pulse — Faz: kart ilişki evreni (parent/epic/issue-link)
+-- Pumar — Faz: kart ilişki evreni (parent/epic/issue-link)
 BEGIN;
 ALTER TABLE work_items ADD COLUMN IF NOT EXISTS parent_key TEXT;
 ALTER TABLE work_items ADD COLUMN IF NOT EXISTS epic_key TEXT;

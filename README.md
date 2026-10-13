@@ -1,4 +1,4 @@
-# Pulse
+# Pumar
 
 Self-hosted GitLab + Jira verisini tek bir bağlı graf olarak birleştiren; canlı görsel
 akış yönetimi ve generatif rapor motoru sunan ekip/proje yönetim platformu.

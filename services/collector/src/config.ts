@@ -6,7 +6,7 @@
 import { config as loadEnv } from "dotenv";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { effectiveConfig } from "@pulse/analytics/settings";
+import { effectiveConfig } from "@pumar/analytics/settings";
 
 // .env monorepo kökünde; komut hangi dizinden çalışırsa çalışsın oradan yükle.
 loadEnv({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../../../.env") });

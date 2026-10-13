@@ -1,10 +1,10 @@
 /**
  * Analytics CLI — metric layer'ı komut satırından dener.
  *
- *   pnpm --filter @pulse/analytics metric throughput assignee
- *   pnpm --filter @pulse/analytics metric bug_ratio sprint
- *   pnpm --filter @pulse/analytics insight aging 5
- *   pnpm --filter @pulse/analytics catalog
+ *   pnpm --filter @pumar/analytics metric throughput assignee
+ *   pnpm --filter @pumar/analytics metric bug_ratio sprint
+ *   pnpm --filter @pumar/analytics insight aging 5
+ *   pnpm --filter @pumar/analytics catalog
  */
 import { pool } from "./db.js";
 import { runMetric } from "./engine.js";

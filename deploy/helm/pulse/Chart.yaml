@@ -1,6 +1,0 @@
-apiVersion: v2
-name: pulse
-description: Pulse — GitLab + Jira birleşik ekip/proje yönetim ve analitik platformu
-type: application
-version: 0.1.0
-appVersion: 'latest'

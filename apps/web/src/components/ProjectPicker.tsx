@@ -13,7 +13,7 @@ export function ProjectPicker({ onPick }: { onPick: (key: string) => void }) {
   return (
     <div className="picker">
       <div className="picker-top">
-        <div className="mark">PULSE<i>/</i>OPS</div>
+        <div className="mark">PUMAR<i>/</i>OPS</div>
         <div className="eyebrow">RELTECO · {now}</div>
       </div>
 
