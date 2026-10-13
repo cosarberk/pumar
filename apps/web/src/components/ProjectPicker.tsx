@@ -3,24 +3,34 @@ import { api, type Project } from "../api";
 import { sparkFor } from "../mock";
 
 /** Giriş ekranı: proje seçimi — Netflix profil seçer gibi büyük monogram tile'lar. */
-export function ProjectPicker({ onPick }: { onPick: (key: string) => void }) {
+export function ProjectPicker({ onPick, onSettings }: { onPick: (key: string) => void; onSettings: () => void }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => { api.projects().then((p) => { setProjects(p); setLoading(false); }); }, []);
 
   const now = new Date().toLocaleDateString("tr-TR", { day: "2-digit", month: "short", year: "numeric" });
+  const empty = !loading && projects.length === 0;
 
   return (
     <div className="picker">
       <div className="picker-top">
         <div className="mark">PUMAR<i>/</i>OPS</div>
-        <div className="eyebrow">RELTECO · {now}</div>
+        <div className="picker-top-r">
+          <div className="eyebrow">RELTECO · {now}</div>
+          <button className="picker-set" onClick={onSettings} title="Jira/GitLab bağlantıları & veri senkronizasyonu">⚙ Ayarlar</button>
+        </div>
       </div>
 
       <div>
-        <h1>Proje Seç<small>{loading ? "projeler yükleniyor…" : "konsola girmek için bir proje seç"}</small></h1>
+        <h1>Proje Seç<small>{loading ? "projeler yükleniyor…" : empty ? "henüz proje yok — önce bağlantıları kur" : "konsola girmek için bir proje seç"}</small></h1>
       </div>
 
+      {empty ? (
+        <div className="picker-empty">
+          <p>Görüntülenecek proje yok. Jira/GitLab bağlantılarını kur ve ilk senkronizasyonu başlat; veri geldikçe projeler burada belirir.</p>
+          <button className="picker-cta" onClick={onSettings}>Ayarlar → Bağlantıları kur &amp; veri çek</button>
+        </div>
+      ) : (
       <div className="tiles">
         {projects.map((p) => (
           <div key={p.key} className="tile" onClick={() => onPick(p.key)}
@@ -44,6 +54,7 @@ export function ProjectPicker({ onPick }: { onPick: (key: string) => void }) {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

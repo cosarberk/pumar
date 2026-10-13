@@ -48,6 +48,7 @@ function MainApp() {
   const [tab, setTab] = useState<Tab>("stream");
   const [live, setLive] = useState(false);
   const [clock, setClock] = useState("");
+  const [preSettings, setPreSettings] = useState(false);
 
   useEffect(() => { api.config(); api.catalog().then(() => setLive(liveBackend)); }, []);
   useEffect(() => {
@@ -58,7 +59,28 @@ function MainApp() {
   function pick(key: string) { setProject(key); setProj(key); setTab("stream"); }
   function back() { setProject(null); setProj(null); }
 
-  if (!project) return <ProjectPicker onPick={pick} />;
+  if (!project) {
+    // Proje seçilmeden önce Ayarlar'a erişim — taze kurulumda (hiç proje yokken)
+    // Jira/GitLab bağlanıp ilk senkronizasyonu başlatabilmek için şart.
+    if (preSettings)
+      return (
+        <div className="app">
+          <header className="topbar">
+            <div className="seg">
+              <span className="mark">PUMAR<i>/</i></span>
+              <span className="proj-chip" onClick={() => setPreSettings(false)} title="Proje seçimine dön">◂ Proje seç</span>
+            </div>
+            <nav className="tabs"><div className="tab on">Ayarlar</div></nav>
+            <div className="right">
+              <div className="seg sync"><span className={`d ${live ? "live" : "mock"}`} />{live ? "CANLI" : "MOCK"}</div>
+              <div className="seg clock num">{clock}</div>
+            </div>
+          </header>
+          <main className="content"><Settings /></main>
+        </div>
+      );
+    return <ProjectPicker onPick={pick} onSettings={() => setPreSettings(true)} />;
+  }
 
   return (
     <div className="app">
