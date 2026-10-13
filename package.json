@@ -1,0 +1,16 @@
+{
+  "name": "pulse",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitLab + Jira birleşik ekip/proje yönetim platformu",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "echo \"TODO: her paket kendi build'ini sağlayacak\"",
+    "dev": "echo \"TODO: dev orkestrasyon\""
+  }
+}

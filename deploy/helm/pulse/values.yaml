@@ -1,0 +1,58 @@
+# Pulse Helm değerleri. Cluster'a özel alanları (storageClass, ingress host)
+# doldurun; gerisi makul varsayılanlarla gelir.
+#
+# Jira/GitLab bağlantıları ENV'den GEÇİLMEZ — deploy sonrası Pulse içindeki
+# "Ayarlar" ekranından girilir ve DB'de tutulur. Böylece token'lar Helm
+# değerlerinde / cluster manifestinde durmaz.
+
+image:
+  # GHCR'deki tek image. Public olduğu için imagePullSecret gerekmez.
+  repository: ghcr.io/cosarberk/pumar
+  tag: latest
+  # Always: "Redeploy" her seferinde taze latest'i çeker.
+  pullPolicy: Always
+
+# Boş bırakılırsa cluster'ın varsayılan StorageClass'ı kullanılır.
+storageClass: ''
+
+postgres:
+  image: postgres:16-alpine
+  user: pulse
+  password: pulse
+  db: pulse
+  storage: 10Gi
+  resources:
+    requests:
+      cpu: '250m'
+      memory: 256Mi
+    limits:
+      cpu: '2'
+      memory: 2Gi
+
+# Fastify API + gömülü web (aynı porttan, same-origin /api).
+server:
+  replicas: 1
+  port: 4000
+  resources:
+    requests:
+      cpu: '250m'
+      memory: 256Mi
+    limits:
+      cpu: '1'
+      memory: 1Gi
+
+# Dış erişim (UI + API aynı host). enabled=true + host verildiğinde
+# kullanıcı Pulse'a bu URL'den erişir.
+ingress:
+  enabled: false
+  className: nginx
+  host: pulse.example.com
+  annotations:
+    # Rapor PDF'leri / büyük grafik yanıtları için gövde limiti
+    nginx.ingress.kubernetes.io/proxy-body-size: '25m'
+    # Senkronizasyon uzun sürebilir; bağlantı erken kapanmasın
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
+  tls:
+    enabled: false
+    secretName: pulse-tls

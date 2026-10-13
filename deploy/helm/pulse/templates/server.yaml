@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.server.replicas }}
+  selector:
+    matchLabels:
+      app: pulse
+  template:
+    metadata:
+      labels:
+        app: pulse
+    spec:
+      # API başlamadan önce şemayı uygula. migrate.ts idempotenttir
+      # (schema_migrations izler); Postgres hazır değilse initContainer
+      # başarısız olur ve k8s pod'u yeniden dener.
+      initContainers:
+        - name: db-migrate
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['npx', 'tsx', 'infra/migrate.ts']
+          env:
+            - name: DATABASE_URL
+              value: postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@postgres:5432/{{ .Values.postgres.db }}
+      containers:
+        - name: pulse
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.server.port }}
+          env:
+            - name: API_PORT
+              value: {{ .Values.server.port | quote }}
+            - name: DATABASE_URL
+              value: postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@postgres:5432/{{ .Values.postgres.db }}
+            # Jira/GitLab kimlikleri ENV'den verilmez; Pulse → "Ayarlar"
+            # ekranından DB'ye girilir (DB > env önceliği).
+          resources: {{- toYaml .Values.server.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulse
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: pulse
+  ports:
+    - port: {{ .Values.server.port }}
+      targetPort: {{ .Values.server.port }}

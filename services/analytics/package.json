@@ -1,0 +1,38 @@
+{
+  "name": "@pulse/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/engine.ts",
+  "exports": {
+    "./engine": "./src/engine.ts",
+    "./catalog": "./src/catalog.ts",
+    "./insights": "./src/queries/insights.ts",
+    "./overview": "./src/queries/overview.ts",
+    "./flow": "./src/queries/flow.ts",
+    "./universe": "./src/queries/universe.ts",
+    "./review": "./src/queries/review.ts",
+    "./collab": "./src/queries/collab.ts",
+    "./settings": "./src/queries/settings.ts",
+    "./report": "./src/queries/report.ts",
+    "./db": "./src/db.ts",
+    "./types": "./src/metrics/types.ts"
+  },
+  "scripts": {
+    "metric": "tsx src/index.ts metric",
+    "insight": "tsx src/index.ts insight",
+    "catalog": "tsx src/index.ts catalog",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pulse/shared": "*",
+    "dotenv": "^16.4.5",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "@types/pg": "^8.11.6",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
