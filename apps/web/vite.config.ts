@@ -7,7 +7,8 @@ export default defineConfig({
     port: 5174,
     proxy: {
       // API'ye proxy — web aynı origin'den /api ile konuşur.
-      "/api": { target: "http://localhost:4000", changeOrigin: true, rewrite: (p) => p.replace(/^\/api/, "") },
+      // Port çakışmasında API_PROXY ile override edilebilir (varsayılan :4000).
+      "/api": { target: process.env.API_PROXY ?? "http://localhost:4000", changeOrigin: true, rewrite: (p) => p.replace(/^\/api/, "") },
     },
   },
 });

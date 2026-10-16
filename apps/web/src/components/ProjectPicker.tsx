@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { api, type Project } from "../api";
+import { api, type Project, type AuthUser } from "../api";
 import { sparkFor } from "../mock";
 
 /** Giriş ekranı: proje seçimi — Netflix profil seçer gibi büyük monogram tile'lar. */
-export function ProjectPicker({ onPick, onSettings }: { onPick: (key: string) => void; onSettings: () => void }) {
+export function ProjectPicker({ onPick, onSettings, user, onLogout }: {
+  onPick: (key: string) => void;
+  onSettings: () => void;
+  user?: AuthUser | null;
+  onLogout?: () => void;
+}) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => { api.projects().then((p) => { setProjects(p); setLoading(false); }); }, []);
@@ -18,6 +23,12 @@ export function ProjectPicker({ onPick, onSettings }: { onPick: (key: string) =>
         <div className="picker-top-r">
           <div className="eyebrow">RELTECO · {now}</div>
           <button className="picker-set" onClick={onSettings} title="Jira/GitLab bağlantıları & veri senkronizasyonu">⚙ Ayarlar</button>
+          {user && onLogout && (
+            <div className="acct">
+              <span className="acct-name" title={`${user.email}${user.role === "admin" ? " · admin" : ""}`}>{user.displayName}</span>
+              <button className="acct-out" onClick={onLogout} title="Oturumu kapat">ÇIKIŞ</button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -15,6 +15,15 @@ image:
 # Boş bırakılırsa cluster'ın varsayılan StorageClass'ı kullanılır.
 storageClass: ''
 
+# İlk admin — yalnızca TAZE kurulumda (users tablosu boşken) otomatik oluşturulur.
+# Kimlik bir k8s Secret'a (pumar-admin) yazılır, API açılışta env'den okur.
+# İlk girişten sonra şifreyi uygulama içinden/CLI ile değiştir; sonraki deploy'lar
+# bu değerlere dokunmaz (idempotent). password boş bırakılırsa bootstrap devre dışı.
+admin:
+  email: admin@pumar.local
+  password: pumar-admin
+  name: Admin
+
 postgres:
   image: postgres:16-alpine
   user: pumar

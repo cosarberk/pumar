@@ -1,3 +1,17 @@
+{{- if .Values.admin.password }}
+# İlk admin kimliği — API açılışta okur, yalnızca users tablosu boşken kullanır.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pumar-admin
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+stringData:
+  ADMIN_EMAIL: {{ .Values.admin.email | quote }}
+  ADMIN_PASSWORD: {{ .Values.admin.password | quote }}
+  ADMIN_NAME: {{ .Values.admin.name | quote }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,6 +51,12 @@ spec:
               value: postgres://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@postgres:5432/{{ .Values.postgres.db }}
             # Jira/GitLab kimlikleri ENV'den verilmez; Pumar → "Ayarlar"
             # ekranından DB'ye girilir (DB > env önceliği).
+          {{- if .Values.admin.password }}
+          # İlk admin bootstrap'i — Secret'tan ADMIN_EMAIL/PASSWORD/NAME.
+          envFrom:
+            - secretRef:
+                name: pumar-admin
+          {{- end }}
           resources: {{- toYaml .Values.server.resources | nindent 12 }}
           readinessProbe:
             httpGet:

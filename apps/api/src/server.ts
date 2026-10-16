@@ -8,8 +8,9 @@
  *   GET  /graph/flow?project=
  *   GET  /graph/knowledge
  */
-import Fastify from "fastify";
+import Fastify, { type FastifyRequest, type FastifyReply } from "fastify";
 import cors from "@fastify/cors";
+import cookie from "@fastify/cookie";
 import fastifyStatic from "@fastify/static";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -26,10 +27,18 @@ import { cfd, cycleTime, velocity, weeklyThroughput, riskRadar, agingDistributio
 import { reviewerLoad, reviewGraph, reviewStats } from "@pumar/analytics/review";
 import { collabBase, collabPerson } from "@pumar/analytics/collab";
 import { effectiveConfig, settingsView, saveSettings, testConnection, syncState } from "@pumar/analytics/settings";
+import { verifyCredentials, createSession, getSessionUser, revokeSession, pruneExpiredSessions, bootstrapAdminFromEnv, createUser, listUsers, setRole, setDisabled, setPassword, SESSION_TTL_DAYS, type User, type Role } from "@pumar/analytics/auth";
 import { listTemplates, getTemplate, saveTemplate, deleteTemplate } from "@pumar/analytics/report";
 import { roots as universeRoots, expand as universeExpand, search as universeSearch, allGraph as universeAll } from "@pumar/analytics/universe";
 import { flowStages } from "./graph.js";
 import type { QuerySpec } from "@pumar/analytics/types";
+
+// Oturum açmış kullanıcı, guard'dan sonra isteğe iliştirilir.
+declare module "fastify" {
+  interface FastifyRequest {
+    authUser?: User;
+  }
+}
 
 // Depo kökü (collector girişi + web build'i buradan çözülür).
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
@@ -44,7 +53,117 @@ const app = Fastify({
     return u.startsWith("/api/") ? u.slice(4) : u;
   },
 });
-await app.register(cors, { origin: true });
+// Cookie tabanlı oturum için credential'lı CORS (dev'de vite proxy aynı origin,
+// ama doğrudan erişimde de cookie geçebilsin diye reflect + credentials).
+await app.register(cors, { origin: true, credentials: true });
+await app.register(cookie);
+
+/* ───────── Kimlik doğrulama ───────── */
+const PROD = process.env.NODE_ENV === "production";
+const SESSION_COOKIE = "pumar_session";
+// Guard'dan muaf açık uçlar (route pattern'ine göre — /api rewrite'ından bağımsız).
+const PUBLIC_ROUTES = new Set(["/health", "/auth/login", "/auth/logout", "/auth/me"]);
+
+function sessionCookieOpts(expires?: Date) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: PROD,
+    path: "/",
+    ...(expires ? { expires } : {}),
+  };
+}
+
+// Eşleşen her API rotasını korur; statik varlıklar ve SPA (notFound → index.html)
+// ile açık uçlar serbesttir. Dev (vite /api'yi soyar) ve prod'da aynı davranır.
+app.addHook("onRequest", async (req, reply) => {
+  const routeUrl = req.routeOptions?.url;
+  if (!routeUrl) return; // 404/SPA fallback → serbest
+  if (routeUrl === "/*" || routeUrl === "/") return; // statik varlıklar → serbest
+  if (PUBLIC_ROUTES.has(routeUrl)) return;
+  const token = req.cookies[SESSION_COOKIE];
+  const user = token ? await getSessionUser(token) : null;
+  if (!user) return reply.code(401).send({ error: "Oturum gerekli" });
+  req.authUser = user;
+});
+
+app.post<{ Body: { email?: string; password?: string } }>("/auth/login", async (req, reply) => {
+  const email = req.body?.email ?? "";
+  const password = req.body?.password ?? "";
+  if (!email || !password) return reply.code(400).send({ error: "E-posta ve şifre gerekli" });
+  const user = await verifyCredentials(email, password);
+  if (!user) return reply.code(401).send({ error: "E-posta veya şifre hatalı" });
+  await pruneExpiredSessions();
+  const { token, expiresAt } = await createSession(user.id, req.headers["user-agent"]);
+  reply.setCookie(SESSION_COOKIE, token, sessionCookieOpts(expiresAt));
+  return { user, ttlDays: SESSION_TTL_DAYS };
+});
+
+app.post("/auth/logout", async (req, reply) => {
+  const token = req.cookies[SESSION_COOKIE];
+  if (token) await revokeSession(token);
+  reply.clearCookie(SESSION_COOKIE, sessionCookieOpts());
+  return { ok: true };
+});
+
+app.get("/auth/me", async (req, reply) => {
+  const token = req.cookies[SESSION_COOKIE];
+  const user = token ? await getSessionUser(token) : null;
+  if (!user) return reply.code(401).send({ error: "Oturum yok" });
+  return { user };
+});
+
+/* ───────── Kullanıcı yönetimi (yalnız admin) ───────── */
+// Oturum zorunluluğu global guard'da; burada ayrıca rol kontrolü.
+async function requireAdmin(req: FastifyRequest, reply: FastifyReply) {
+  if (req.authUser?.role !== "admin") return reply.code(403).send({ error: "Yönetici yetkisi gerekli" });
+}
+const isSelf = (req: FastifyRequest, email: string) =>
+  req.authUser!.email.toLowerCase() === email.trim().toLowerCase();
+
+app.get("/users", { preHandler: requireAdmin }, async () => listUsers());
+
+app.post<{ Body: { email: string; displayName: string; password: string; role?: Role } }>(
+  "/users", { preHandler: requireAdmin },
+  async (req, reply) => {
+    const b = req.body;
+    try {
+      return await createUser({ email: b.email, displayName: b.displayName, password: b.password, role: b.role });
+    } catch (e) {
+      return reply.code(400).send({ error: e instanceof Error ? e.message : "Kullanıcı oluşturulamadı" });
+    }
+  },
+);
+
+app.post<{ Body: { email: string; role: Role } }>(
+  "/users/role", { preHandler: requireAdmin },
+  async (req, reply) => {
+    const { email, role } = req.body;
+    if (role !== "admin" && role !== "member") return reply.code(400).send({ error: "Geçersiz rol" });
+    if (isSelf(req, email) && role !== "admin") return reply.code(400).send({ error: "Kendi admin rolünü düşüremezsin" });
+    try { await setRole(email, role); return { ok: true }; }
+    catch (e) { return reply.code(404).send({ error: e instanceof Error ? e.message : "Kullanıcı bulunamadı" }); }
+  },
+);
+
+app.post<{ Body: { email: string; disabled: boolean } }>(
+  "/users/disable", { preHandler: requireAdmin },
+  async (req, reply) => {
+    const { email, disabled } = req.body;
+    if (isSelf(req, email) && disabled) return reply.code(400).send({ error: "Kendi hesabını devre dışı bırakamazsın" });
+    try { await setDisabled(email, !!disabled); return { ok: true }; }
+    catch (e) { return reply.code(404).send({ error: e instanceof Error ? e.message : "Kullanıcı bulunamadı" }); }
+  },
+);
+
+app.post<{ Body: { email: string; password: string } }>(
+  "/users/password", { preHandler: requireAdmin },
+  async (req, reply) => {
+    const { email, password } = req.body;
+    try { await setPassword(email, password); return { ok: true }; }
+    catch (e) { return reply.code(400).send({ error: e instanceof Error ? e.message : "Şifre güncellenemedi" }); }
+  },
+);
 
 app.get("/health", async () => ({ ok: true }));
 
@@ -259,6 +378,13 @@ if (existsSync(WEB_DIST)) {
   );
   app.log.info(`Web dist: ${WEB_DIST}`);
 }
+
+// İlk admin'i env'den bootstrap et (k8s: Helm → Secret). Yalnızca tablo boşsa.
+const bootstrapped = await bootstrapAdminFromEnv().catch((e) => {
+  app.log.error(`Admin bootstrap başarısız: ${e instanceof Error ? e.message : e}`);
+  return null;
+});
+if (bootstrapped) app.log.info(`İlk admin oluşturuldu: ${bootstrapped}`);
 
 const port = Number(process.env.API_PORT ?? 4000);
 app.listen({ port, host: "0.0.0.0" }).then(() => app.log.info(`Pumar API :${port}`));

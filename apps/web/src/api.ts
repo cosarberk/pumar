@@ -30,14 +30,102 @@ export interface Stage { id: string; label: string; count: number }
 
 export let liveBackend = false;
 
+export interface AuthUser { id: number; email: string; displayName: string; role: "admin" | "member"; disabled: boolean }
+export type AuthState =
+  | { status: "authenticated"; user: AuthUser }
+  | { status: "unauthenticated" }
+  | { status: "offline" };
+
+// Oturum, kullanım sırasında düşerse (ör. backend restart / token revoke) App'i
+// login'e geri atmak için global kanca.
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(fn: (() => void) | null) { onUnauthorized = fn; }
+
 async function tryFetch<T>(path: string, init?: RequestInit): Promise<T | null> {
   try {
-    const r = await fetch(`${BASE}${path}`, { ...init, signal: AbortSignal.timeout(2500) });
+    const r = await fetch(`${BASE}${path}`, { ...init, credentials: "include", signal: AbortSignal.timeout(2500) });
+    if (r.status === 401) {
+      // Backend ayakta ama oturum yok/geçersiz → mock'a düşme, login'e yönlendir.
+      liveBackend = true;
+      onUnauthorized?.();
+      return null;
+    }
     if (!r.ok) return null;
     liveBackend = true;
     return (await r.json()) as T;
   } catch { return null; }
 }
+
+export const auth = {
+  /** Oturum durumu: authenticated / unauthenticated (backend ayakta) / offline (backend yok → mock). */
+  async me(): Promise<AuthState> {
+    try {
+      const r = await fetch(`${BASE}/auth/me`, { credentials: "include", signal: AbortSignal.timeout(2500) });
+      liveBackend = true;
+      if (!r.ok) return { status: "unauthenticated" };
+      const j = (await r.json()) as { user: AuthUser };
+      return { status: "authenticated", user: j.user };
+    } catch {
+      return { status: "offline" };
+    }
+  },
+  async login(email: string, password: string): Promise<{ ok: true; user: AuthUser } | { ok: false; error: string }> {
+    try {
+      const r = await fetch(`${BASE}/auth/login`, {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        signal: AbortSignal.timeout(7000),
+      });
+      liveBackend = true;
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return { ok: false, error: (j as { error?: string }).error ?? `Giriş başarısız (HTTP ${r.status})` };
+      return { ok: true, user: (j as { user: AuthUser }).user };
+    } catch {
+      return { ok: false, error: "Sunucuya erişilemedi" };
+    }
+  },
+  async logout(): Promise<void> {
+    try { await fetch(`${BASE}/auth/logout`, { method: "POST", credentials: "include", signal: AbortSignal.timeout(2500) }); }
+    catch { /* yut */ }
+  },
+};
+
+export interface UserRow extends AuthUser { createdAt: string; lastLoginAt: string | null }
+type Mutation = { ok: true } | { ok: false; error: string };
+
+/** Admin işlemleri — hata mesajını UI'ya taşımak için tryFetch yerine açık fetch. */
+async function adminPost(path: string, body: unknown): Promise<Mutation> {
+  try {
+    const r = await fetch(`${BASE}${path}`, {
+      method: "POST", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(7000),
+    });
+    if (r.status === 401) { onUnauthorized?.(); return { ok: false, error: "Oturum düştü" }; }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return { ok: false, error: (j as { error?: string }).error ?? `HTTP ${r.status}` };
+    return { ok: true };
+  } catch { return { ok: false, error: "Sunucuya erişilemedi" }; }
+}
+
+export const adminApi = {
+  async users(): Promise<UserRow[]> {
+    return (await tryFetch<UserRow[]>("/users")) ?? [];
+  },
+  create(email: string, displayName: string, password: string, role: "admin" | "member"): Promise<Mutation> {
+    return adminPost("/users", { email, displayName, password, role });
+  },
+  setRole(email: string, role: "admin" | "member"): Promise<Mutation> {
+    return adminPost("/users/role", { email, role });
+  },
+  setDisabled(email: string, disabled: boolean): Promise<Mutation> {
+    return adminPost("/users/disable", { email, disabled });
+  },
+  setPassword(email: string, password: string): Promise<Mutation> {
+    return adminPost("/users/password", { email, password });
+  },
+};
 
 const qp = (p?: string) => (p ? `?project=${encodeURIComponent(p)}` : "");
 const qs = (o: Record<string, string | undefined>) =>

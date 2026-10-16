@@ -561,4 +561,75 @@ td.k { color: var(--amber); }
 .card-exp { cursor: pointer; color: var(--dim); font-family: var(--mono); font-size: 13px; background: transparent; border: 0; padding: 0 4px; }
 .card-exp:hover { color: var(--amber); }
 
+/* ---------- Oturum: açılış denetimi + login ---------- */
+.boot { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.boot .mark { font-family: var(--disp); font-weight: 800; font-size: 28px; letter-spacing: 1px; }
+.boot .mark i { color: var(--amber); font-style: normal; }
+
+.login { height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; }
+.login-grid { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(900px 500px at 50% 0%, rgba(243,168,43,0.07), transparent 60%); }
+.login-card { position: relative; width: 100%; max-width: 380px; background: var(--panel);
+  border: 1px solid var(--line-2); padding: clamp(26px, 4vw, 38px); display: flex; flex-direction: column; gap: 18px; }
+.login-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.login-head .mark { font-family: var(--disp); font-weight: 800; font-size: 19px; letter-spacing: 1px; }
+.login-head .mark i { color: var(--amber); font-style: normal; }
+.login-title { font-family: var(--disp); font-weight: 700; font-size: 34px; letter-spacing: -0.5px; margin: 0; line-height: 0.95; text-transform: uppercase; }
+.login-title small { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-top: 8px; }
+.login-field { display: flex; flex-direction: column; gap: 6px; }
+.login-field span { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--dim); }
+.login-field input { font-family: var(--mono); font-size: 13px; color: var(--bone); background: var(--ink); border: 1px solid var(--line-2); padding: 11px 12px; outline: none; transition: border-color .15s; }
+.login-field input:focus { border-color: var(--amber); }
+.login-field input::placeholder { color: var(--dim-2); }
+.login-error { font-family: var(--mono); font-size: 11.5px; color: var(--bad); border: 1px solid rgba(255,92,108,0.4); background: rgba(255,92,108,0.08); padding: 9px 11px; }
+.login-submit { font-family: var(--mono); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); background: var(--amber); border: 0; padding: 13px; cursor: pointer; font-weight: 600; transition: filter .15s, opacity .15s; }
+.login-submit:hover:not(:disabled) { filter: brightness(1.08); }
+.login-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.login-foot { text-align: center; }
+
+/* ---------- Üst şerit: hesap + çıkış ---------- */
+.acct { display: flex; align-items: center; gap: 10px; }
+.acct-name { font-family: var(--mono); font-size: 11px; color: var(--bone); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-out { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--dim); background: transparent; border: 1px solid var(--line-2); padding: 5px 9px; cursor: pointer; transition: border-color .15s, color .15s; }
+.acct-out:hover { border-color: var(--bad); color: var(--bad); }
+
+/* ---------- Admin: kullanıcı yönetimi ---------- */
+.users { padding: clamp(16px, 2.5vw, 32px); display: flex; flex-direction: column; gap: 18px; }
+.users-head h2 { font-family: var(--disp); font-weight: 700; font-size: 26px; letter-spacing: -0.3px; margin: 0; text-transform: uppercase; }
+.users-head h2 small { font-family: var(--mono); font-size: 10.5px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; margin-left: 12px; }
+.users-msg { font-family: var(--mono); font-size: 12px; padding: 9px 12px; border: 1px solid; }
+.users-msg.ok { color: var(--good); border-color: rgba(87,201,138,0.4); background: rgba(87,201,138,0.08); }
+.users-msg.err { color: var(--bad); border-color: rgba(255,92,108,0.4); background: rgba(255,92,108,0.08); }
+
+.users-add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border: 1px solid var(--line-2); background: var(--ink-2); padding: 12px; }
+.users-add input, .users-add select { font-family: var(--mono); font-size: 12px; color: var(--bone); background: var(--ink); border: 1px solid var(--line-2); padding: 9px 10px; outline: none; transition: border-color .15s; }
+.users-add input:focus, .users-add select:focus { border-color: var(--amber); }
+.users-add input[type="email"] { flex: 1 1 200px; }
+.users-add input[type="text"] { flex: 1 1 140px; }
+.users-add input[type="password"] { flex: 1 1 140px; }
+.users-add button { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--amber); border: 0; padding: 10px 16px; cursor: pointer; font-weight: 600; transition: filter .15s, opacity .15s; }
+.users-add button:hover:not(:disabled) { filter: brightness(1.08); }
+.users-add button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.users-table { border: 1px solid var(--line); }
+.usr-row { display: grid; grid-template-columns: 2fr 1.2fr 0.9fr 0.8fr 1.3fr 2.4fr; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; }
+.usr-row:last-child { border-bottom: 0; }
+.usr-row.off { opacity: 0.5; }
+.usr-th { background: var(--ink-2); font-size: 10px; letter-spacing: 1.5px; color: var(--dim); text-transform: uppercase; }
+.usr-mail { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.usr-you { color: var(--amber); font-style: normal; font-size: 10px; }
+.usr-badge { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border: 1px solid var(--line-2); }
+.usr-badge.admin { color: var(--amber); border-color: rgba(243,168,43,0.5); }
+.usr-badge.member { color: var(--dim); }
+.usr-on { color: var(--good); }
+.usr-off { color: var(--bad); }
+.usr-act { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.usr-act button { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.5px; color: var(--bone); background: transparent; border: 1px solid var(--line-2); padding: 5px 9px; cursor: pointer; transition: border-color .15s, color .15s; }
+.usr-act button:hover:not(:disabled) { border-color: var(--amber); color: var(--amber); }
+.usr-act button.ghost:hover:not(:disabled) { border-color: var(--bad); color: var(--bad); }
+.usr-act button:disabled { opacity: 0.35; cursor: not-allowed; }
+.usr-act .usr-pw { font-family: var(--mono); font-size: 11px; color: var(--bone); background: var(--ink); border: 1px solid var(--line-2); padding: 5px 8px; outline: none; }
+.usr-act .usr-pw:focus { border-color: var(--amber); }
+.usr-empty { padding: 20px; text-align: center; color: var(--dim); font-family: var(--mono); font-size: 12px; }
+
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

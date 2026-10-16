@@ -14,6 +14,7 @@
     "./review": "./src/queries/review.ts",
     "./collab": "./src/queries/collab.ts",
     "./settings": "./src/queries/settings.ts",
+    "./auth": "./src/queries/auth.ts",
     "./report": "./src/queries/report.ts",
     "./db": "./src/db.ts",
     "./types": "./src/metrics/types.ts"
@@ -22,6 +23,8 @@
     "metric": "tsx src/index.ts metric",
     "insight": "tsx src/index.ts insight",
     "catalog": "tsx src/index.ts catalog",
+    "user": "tsx src/users.ts",
+    "user:add": "PUMAR_USER_CMD=add tsx src/users.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
