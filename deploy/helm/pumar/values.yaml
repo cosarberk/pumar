@@ -8,7 +8,7 @@
 image:
   # GHCR'deki tek image. Public olduğu için imagePullSecret gerekmez.
   repository: ghcr.io/cosarberk/pumar
-  tag: v0.1.1
+  tag: v0.1.2
   # Always: "Redeploy" her seferinde taze latest'i çeker.
   pullPolicy: Always
 

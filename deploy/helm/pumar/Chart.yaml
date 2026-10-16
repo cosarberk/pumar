@@ -2,5 +2,5 @@ apiVersion: v2
 name: pumar
 description: Pumar — GitLab + Jira birleşik ekip/proje yönetim ve analitik platformu
 type: application
-version: 0.1.1
-appVersion: 'v0.1.1'
+version: 0.1.2
+appVersion: 'v0.1.2'
